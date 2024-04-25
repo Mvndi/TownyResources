@@ -22,6 +22,7 @@ import io.github.townyadvanced.townyresources.objects.ResourceExtractionCategory
 import io.github.townyadvanced.townyresources.objects.ResourceOfferCategory;
 import io.github.townyadvanced.townyresources.util.ItemsAdderUtil;
 import io.github.townyadvanced.townyresources.util.MMOItemsUtil;
+import io.github.townyadvanced.townyresources.util.MvndiEquipmentUtil;
 import io.github.townyadvanced.townyresources.util.MythicMobsUtil;
 import io.github.townyadvanced.townyresources.util.OraxenUtil;
 
@@ -282,6 +283,10 @@ public class TownyResourcesSettings {
 		// Oraxen integration
 		if (TownyResources.getPlugin().isOraxenInstalled() 
 		&& OraxenUtil.isValidItem(materialName))
+			return true;
+
+		if (TownyResources.getPlugin().isMvndiEquipmentInstalled()
+		&& MvndiEquipmentUtil.isValidItem(materialName))
 			return true;
 
 		return false; //Unknown material		

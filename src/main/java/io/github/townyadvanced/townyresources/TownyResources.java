@@ -49,6 +49,7 @@ public class TownyResources extends JavaPlugin {
 	private static boolean mmmoItemsInstalled;
 	private static boolean itemsAdderInstalled;
 	private static boolean oraxenInstalled;
+	private static boolean mvndiEquipmentInstalled;
 
 	public TownyResources() {
 		plugin = this;
@@ -273,6 +274,14 @@ public class TownyResources extends JavaPlugin {
 		return mmmoItemsInstalled;
 	}
 
+	public boolean isMvndiEquipmentInstalled() {
+		return mvndiEquipmentInstalled;
+	}
+
+	private String getTownyVersion() {
+        return Bukkit.getPluginManager().getPlugin("Towny").getDescription().getVersion();
+    }
+    
 	private void townyVersionCheck() throws TownyException{
 		try {
 			if (Towny.isTownyVersionSupported(requiredTownyVersion))
@@ -331,6 +340,11 @@ public class TownyResources extends JavaPlugin {
 		mmmoItemsInstalled = mmmoItems != null;
 		if (mmmoItemsInstalled)
 			info("  MMOItems Integration Enabled");
+
+		Plugin mvndiEquipment = Bukkit.getPluginManager().getPlugin("MvndiEquipment");
+		mvndiEquipmentInstalled = mvndiEquipment != null;
+		if (mvndiEquipmentInstalled)
+			info(" MvndiEquipment Integration Enabled");
 
 		Plugin languageUtils = Bukkit.getPluginManager().getPlugin("LangUtils");
 		languageUtilsInstalled = languageUtils != null;

@@ -221,6 +221,14 @@ public class TownyResourcesMessagingUtil {
                     return oName;
                 }
             }
+
+            // MvndiEquipment integration
+            if(TownyResources.getPlugin().isMvndiEquipmentInstalled()) {
+                String meName = MvndiEquipmentUtil.getMaterialNameForDisplay(materialName);
+                if (meName != null) {
+                    return meName;
+                }
+            }
         } else {
             if(TownyResources.getPlugin().isLanguageUtilsInstalled()) {           
                 ItemStack fakeItemStack = new ItemStack(material);
