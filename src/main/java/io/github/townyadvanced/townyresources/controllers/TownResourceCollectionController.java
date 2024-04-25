@@ -10,6 +10,7 @@ import io.github.townyadvanced.townyresources.metadata.TownyResourcesGovernmentM
 import io.github.townyadvanced.townyresources.settings.TownyResourcesSettings;
 import io.github.townyadvanced.townyresources.util.ItemsAdderUtil;
 import io.github.townyadvanced.townyresources.util.MMOItemsUtil;
+import io.github.townyadvanced.townyresources.util.MvndiEquipmentUtil;
 import io.github.townyadvanced.townyresources.util.MythicMobsUtil;
 import io.github.townyadvanced.townyresources.util.OraxenUtil;
 import io.github.townyadvanced.townyresources.util.TownyResourcesMessagingUtil;
@@ -166,9 +167,19 @@ public class TownResourceCollectionController {
 
             //  Oraxen integration
             if (TownyResources.getPlugin().isOraxenInstalled()) {
-                ItemStack itemsAdderItem = OraxenUtil.getItemStack(materialName, amount);
-                if (itemsAdderItem != null) {
-                    itemStack = itemsAdderItem;
+                ItemStack oraxenItem = OraxenUtil.getItemStack(materialName, amount);
+                if (oraxenItem != null) {
+                    itemStack = oraxenItem;
+                    itemStackList.add(itemStack);
+                    continue;
+                }
+            }
+
+            // MvndiEquipment integration
+            if (TownyResources.getPlugin().isMvndiEquipmentInstalled()) {
+                ItemStack mvndiEquipmentItem = MvndiEquipmentUtil.getItemStack(materialName, amount);
+                if (mvndiEquipmentItem != null) {
+                    itemStack = mvndiEquipmentItem;
                     itemStackList.add(itemStack);
                     continue;
                 }
