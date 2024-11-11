@@ -9,15 +9,15 @@ public class MvndiEquipmentUtil {
 
     @Nullable
     public static ItemStack getItemStack(String materialName, int amount) {
-        return ItemManager.createItem(materialName, amount);
+        return ItemManager.getInstance().create(materialName, amount);
     }
 
     public static String getMaterialNameForDisplay(String materialName) {
-        return ItemManager.getItem(materialName).getDisplayName(); 
+        return ItemManager.getInstance().getItem(materialName).name;
     }
 
-	public static boolean isValidItem(String materialName) {
-		return ItemManager.exists(materialName);
-	}
+    public static boolean isValidItem(String materialName) {
+        return ItemManager.getInstance().getItem(materialName) != null;
+    }
 
 }
