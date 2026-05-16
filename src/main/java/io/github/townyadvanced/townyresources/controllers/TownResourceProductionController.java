@@ -30,27 +30,27 @@ public class TownResourceProductionController {
 
     /**
      * Recalculate production for all towns
-     * 
+     *
      * Note: This method does not recalculate production for any nations
      */
     private static void recalculateProductionForAllTowns() {
-        for(Town town: TownyUniverse.getInstance().getTowns()) {           
+        for(Town town: TownyUniverse.getInstance().getTowns()) {
             recalculateProductionForOneTown(town);
         }
     }
 
     /**
      * Recalculate production for a single town
-     * 
+     *
      * Note: This method does not recalculate the nation production
-     *         
+     *
      * @param town the town to recalculate production for
      */
-    static void recalculateProductionForOneTown(Town town) {
+    public static void recalculateProductionForOneTown(Town town) {
         try {
             //Get discovered resources
             List<String> discoveredResources = new ArrayList<>(TownyResourcesGovernmentMetaDataController.getDiscoveredAsList(town));
-    
+
             //Remove any discovered resources which are no longer on offer
             Map<String, ResourceOfferCategory> allOffers = TownResourceOffersController.getMaterialToResourceOfferCategoryMap();
             List<String> resourcesToRemove = new ArrayList<>();
@@ -70,10 +70,10 @@ public class TownResourceProductionController {
 
             //Build the town production map
             Map<String, Integer> townProduction = calculateProduction(town, townCutNormalized);
-    
+
             //Save data
-            TownyResourcesGovernmentMetaDataController.setDailyProduction(town, townProduction);    
-            town.save();            
+            TownyResourcesGovernmentMetaDataController.setDailyProduction(town, townProduction);
+            town.save();
         } catch (Exception e) {
             TownyResources.severe("Problem recalculating production for town" + town.getName());
             e.printStackTrace();
@@ -82,7 +82,7 @@ public class TownResourceProductionController {
 
     private static double calculateTownCutNormalized(Town town) {
         if(TownyResources.getPlugin().isSiegeWarInstalled()
-            && TownOccupationController.isTownOccupied(town)) {
+                && TownOccupationController.isTownOccupied(town)) {
             return 1 - TownyResourcesSettings.getTownResourcesProductionOccupyingNationTaxNormalized();
         } else if (town.hasNation()) {
             return 1 - TownyResourcesSettings.getTownResourcesProductionNationTaxNormalized();
@@ -93,7 +93,7 @@ public class TownResourceProductionController {
 
     /**
      * Recalculate production for all nations
-     * 
+     *
      * Note: This method does not recalculate production for any towns
      */
     private static void recalculateProductionForAllNations() {
@@ -104,12 +104,12 @@ public class TownResourceProductionController {
 
     /**
      * Recalculate production for a single nation
-     *         
+     *
      * Note: This method does not recalculate production for any towns
 
      * @param nation the nation to recalculate production for
      */
-    static void recalculateProductionForOneNation(Nation nation) {
+    public static void recalculateProductionForOneNation(Nation nation) {
         //Setup Variables
         Map<String,Integer> nationProduction = new HashMap<>();
         double nationCutNormalized;
@@ -121,8 +121,8 @@ public class TownResourceProductionController {
         for(Town town: nation.getTowns()) {
             //Calculate Nation Cut
             nationCutNormalized = TownyResources.getPlugin().isSiegeWarInstalled() && TownOccupationController.isTownOccupied(town)
-                ? TownyResourcesSettings.getTownResourcesProductionOccupyingNationTaxNormalized() // Town occupied by their nation.
-                : TownyResourcesSettings.getTownResourcesProductionNationTaxNormalized();         // Town not occupied.
+                    ? TownyResourcesSettings.getTownResourcesProductionOccupyingNationTaxNormalized() // Town occupied by their nation.
+                    : TownyResourcesSettings.getTownResourcesProductionNationTaxNormalized();         // Town not occupied.
 
             //Take resources from town
             resourcesTakenFromTown = calculateProduction(town, nationCutNormalized);
@@ -147,18 +147,18 @@ public class TownResourceProductionController {
 
 
     /**
-     * Utility Method 
+     * Utility Method
      * Calculate Production
      * This can be used for a town or nation
-     * 
+     *
      * @param town the town producing the resource
      * @param cutNormalized the cut of the resource to return
      * @return the production as a map, with each value multiplied by the given cutNormalized value
      */
-    private static Map<String, Integer> calculateProduction(Town town, double cutNormalized) {        
+    private static Map<String, Integer> calculateProduction(Town town, double cutNormalized) {
         //Get all offers
         Map<String, ResourceOfferCategory> allOffers = TownResourceOffersController.getMaterialToResourceOfferCategoryMap();
-        
+
         //Get discovered resources
         List<String> discoveredResources = new ArrayList<>(TownyResourcesGovernmentMetaDataController.getDiscoveredAsList(town));
 
@@ -180,11 +180,12 @@ public class TownResourceProductionController {
             } else {
                 baseProducedAmount = allOffers.get(material).getBaseAmountItems();
                 bonusesPerResourceLevel = TownyResourcesSettings.isNonDynamicAmountMaterial(material) ? 1.0 : normalizedBonusesPerResourceLevel.get(i);
-                finalProducedAmount = (int)((baseProducedAmount * bonusesPerResourceLevel * cutNormalized) + 0.5);
+                double buildRating = TownyResourcesGovernmentMetaDataController.getTownBuildRating(town);
+                finalProducedAmount = (int)((baseProducedAmount * bonusesPerResourceLevel * cutNormalized * buildRating) + 0.5);
             }
             production.put(material, finalProducedAmount);
         }
-            
+
         return production;
     }
 
@@ -207,7 +208,7 @@ public class TownResourceProductionController {
             if(produceResourcesForOneGovernment(town))
                 numProducingTowns++;
         }
-        TownyResourcesMessagingUtil.sendGlobalMessage(Translatable.of("townyresources.production.message", numProducingTowns));        
+        TownyResourcesMessagingUtil.sendGlobalMessage(Translatable.of("townyresources.production.message", numProducingTowns));
     }
 
     /**
@@ -220,9 +221,9 @@ public class TownResourceProductionController {
     }
 
     /**
-     * Utility Method 
+     * Utility Method
      * Produce resources for just one government (i.e either a town or nation)
-     * 
+     *
      * @param government the government to produce resources
      * @return true if any resources were produced
      */
@@ -230,16 +231,16 @@ public class TownResourceProductionController {
         try {
             //Get daily production
             Map<String, Integer> townDailyProduction = TownyResourcesGovernmentMetaDataController.getDailyProductionAsMap(government);
-    
+
             if(townDailyProduction.isEmpty())
                 return false;
-                
+
             //Get the list of resources which are already available for collection
             Map<String,Integer> availableResources = TownyResourcesGovernmentMetaDataController.getAvailableForCollectionAsMap(government);
-    
+
             //Get storage Limit modifier
             int storageLimitModifier = TownyResourcesSettings.getStorageLimitModifier();
-            
+
             //Produce resources
             String resource;
             int quantityToProduce;
@@ -251,10 +252,10 @@ public class TownResourceProductionController {
                 resource = townProductionEntry.getKey();
                 townLevelModifier = government instanceof Town town ? TownySettings.getTownLevel(town).resourceProductionModifier() : 1.0;
                 townMultiplier = government instanceof Town town ? (TownyResourcesGovernmentMetaDataController.getTownMultiplier(town) / 100.0) : 1.0;
-				if (TownyResourcesSettings.isNonDynamicAmountMaterial(resource)) {
-					townLevelModifier = 1.0;
-					townMultiplier = 1.0;
-				}
+                if (TownyResourcesSettings.isNonDynamicAmountMaterial(resource)) {
+                    townLevelModifier = 1.0;
+                    townMultiplier = 1.0;
+                }
                 quantityToProduce = (int) (townProductionEntry.getValue() * townLevelModifier * townMultiplier);
                 if(quantityToProduce == 0)
                     continue;
@@ -265,8 +266,8 @@ public class TownResourceProductionController {
                     if(currentQuantity == storageLimit) {
                         continue; //Already at limit
                     } else if (currentQuantity + quantityToProduce > storageLimit) {
-                        quantityToProduce = storageLimit - currentQuantity; 
-                    }                       
+                        quantityToProduce = storageLimit - currentQuantity;
+                    }
                     //Add to existing available resources
                     availableResources.put(resource, currentQuantity + quantityToProduce);
                 } else {
@@ -274,18 +275,18 @@ public class TownResourceProductionController {
                     availableResources.put(resource, quantityToProduce);
                 }
             }
-    
+
             //Set the list of available resources
-            TownyResourcesGovernmentMetaDataController.setAvailableForCollection(government, availableResources);    
-            
+            TownyResourcesGovernmentMetaDataController.setAvailableForCollection(government, availableResources);
+
             //Save government
-            government.save();        
-                           
-            } catch (Exception e) {
-                TownyResources.severe("Problem producing resources for government " + government.getName());
-                e.printStackTrace();
-                return false;
-            }
+            government.save();
+
+        } catch (Exception e) {
+            TownyResources.severe("Problem producing resources for government " + government.getName());
+            e.printStackTrace();
+            return false;
+        }
 
         //Some resources were produced. Return true;
         return true;

@@ -17,6 +17,7 @@ import com.palmergames.util.StringMgmt;
 
 import io.github.townyadvanced.townyresources.TownyResources;
 import io.github.townyadvanced.townyresources.controllers.TownResourceDiscoveryController;
+import io.github.townyadvanced.townyresources.controllers.TownResourceProductionController;
 import io.github.townyadvanced.townyresources.enums.TownyResourcesPermissionNodes;
 import io.github.townyadvanced.townyresources.metadata.BypassEntries;
 import io.github.townyadvanced.townyresources.metadata.TownyResourcesGovernmentMetaDataController;
@@ -34,7 +35,7 @@ import java.util.Locale;
 import java.util.UUID;
 
 public class TownyAdminResourcesAddon extends BaseCommand implements CommandExecutor, TabCompleter {
-	
+
 	public TownyAdminResourcesAddon() {
 		AddonCommand townyAdminResourcesCommand = new AddonCommand(CommandType.TOWNYADMIN, "resources", this);
 		TownyCommandAddonAPI.addSubCommand(townyAdminResourcesCommand);
@@ -47,15 +48,20 @@ public class TownyAdminResourcesAddon extends BaseCommand implements CommandExec
 			return NameUtil.filterByStart(tabCompletes, args[0]);
 		else if(args.length == 2) {
 			switch (args[0].toLowerCase(Locale.ROOT)) {
-			case "reroll_all_resources", "town":
-				return getTownyStartingWith(args[1], "t");
+				case "reroll_all_resources", "town":
+					return getTownyStartingWith(args[1], "t");
 			}
 		}
 		else if (args.length == 3 && args[0].toLowerCase(Locale.ROOT).equals("town")) {
-			return Arrays.asList("setmultiplier");
+			System.out.println("AAA " + Arrays.toString(args));
+			return Arrays.asList("setmultiplier", "setbuildrating");
 		}
 		else if (args.length == 4 && args[0].toLowerCase(Locale.ROOT).equals("town")) {
-			return Arrays.asList("90","100","120","150","...");
+			if (args[2].toLowerCase(Locale.ROOT).equals("setmultiplier")) {
+				return Arrays.asList("90","100","120","150","...");
+			} else {
+				return Arrays.asList("0.0","0.5","0.75","1.0");
+			}
 		}
 		return Collections.emptyList();
 	}
@@ -63,7 +69,7 @@ public class TownyAdminResourcesAddon extends BaseCommand implements CommandExec
 	public boolean onCommand(CommandSender sender, Command cmd, String commandLabel, String[] args) {
 		if (args.length > 0)
 			parseAdminCommand(sender, args);
-		else 
+		else
 			showHelp(sender);
 		return true;
 	}
@@ -72,7 +78,7 @@ public class TownyAdminResourcesAddon extends BaseCommand implements CommandExec
 		/*
 		 * Parse Command.
 		 */
-	 	try {
+		try {
 			//This permission check handles all the perms checks
 			if (sender instanceof Player)
 				checkPermOrThrow(sender, TownyResourcesPermissionNodes.TOWNY_RESOURCES_ADMIN_COMMAND.getNode(args[0]));
@@ -81,7 +87,7 @@ public class TownyAdminResourcesAddon extends BaseCommand implements CommandExec
 				case "reload" -> parseReloadCommand(sender);
 				case "reroll_all_resources" -> parseReRollCommand(sender, StringMgmt.remFirstArg(args));
 				case "bypass" -> bypassExtractionLimitCommand(sender);
-				case "town" -> setTownMultiplier(sender, StringMgmt.remFirstArg(args));
+				case "town" -> parseTownAdminCommand(sender, StringMgmt.remFirstArg(args));
 				/*
 				 * Show help if no command found.
 				 */
@@ -101,6 +107,7 @@ public class TownyAdminResourcesAddon extends BaseCommand implements CommandExec
 		TownyMessaging.sendMessage(sender, ChatTools.formatCommand("Eg", "/ta resources", "bypass", translator.of("townyresources.admin_help_bypass")));
 		TownyMessaging.sendMessage(sender, ChatTools.formatCommand("Eg", "/ta resources", "town [townname] setmultiplier [percent]", translator.of("townyresources.tra_town_setmultiplierhelp")));
 		TownyMessaging.sendMessage(sender, ChatTools.formatCommand("Eg", "/ta resources", "town [townname] setmultiplier [100]", translator.of("townyresources.tra_town_setmultiplierhelp2")));
+		TownyMessaging.sendMessage(sender, ChatTools.formatCommand("Eg", "/ta resources", "town [townname] setbuildrating [0.0-1.0]", "Sets the build rating (0.0-1.0) which multiplies town resource production."));
 	}
 
 	private void parseReloadCommand(CommandSender sender) {
@@ -114,22 +121,22 @@ public class TownyAdminResourcesAddon extends BaseCommand implements CommandExec
 	private void parseReRollCommand(CommandSender sender, String[] args) throws TownyException {
 		if (args.length == 0) {
 			Confirmation.runOnAcceptAsync(() -> {
-				TownResourceDiscoveryController.reRollAllExistingResources();
-				TownyResourcesMessagingUtil.sendGlobalMessage(Translatable.of("townyresources.all_resources_rerolled"));
-			})
-			.setTitle(Translatable.of("townyresources.msg_confirm_reroll"))
-			.sendTo(sender);
+						TownResourceDiscoveryController.reRollAllExistingResources();
+						TownyResourcesMessagingUtil.sendGlobalMessage(Translatable.of("townyresources.all_resources_rerolled"));
+					})
+					.setTitle(Translatable.of("townyresources.msg_confirm_reroll"))
+					.sendTo(sender);
 			return;
 		}
-		
+
 		Town town = getTownOrThrow(args[0]);
 		Confirmation.runOnAcceptAsync(() -> {
-			TownResourceDiscoveryController.reRollExistingResources(town, false);
-			TownyMessaging.sendPrefixedTownMessage(town, Translatable.of("townyresources.all_resources_rerolled"));
-			TownyResourcesMessagingUtil.sendMsg(sender, Translatable.of("townyresources.all_resources_rerolled"));
-		})
-		.setTitle(Translatable.of("townyresources.msg_confirm_reroll_town"))
-		.sendTo(sender);
+					TownResourceDiscoveryController.reRollExistingResources(town, false);
+					TownyMessaging.sendPrefixedTownMessage(town, Translatable.of("townyresources.all_resources_rerolled"));
+					TownyResourcesMessagingUtil.sendMsg(sender, Translatable.of("townyresources.all_resources_rerolled"));
+				})
+				.setTitle(Translatable.of("townyresources.msg_confirm_reroll_town"))
+				.sendTo(sender);
 	}
 
 	private void bypassExtractionLimitCommand(CommandSender sender) {
@@ -144,17 +151,49 @@ public class TownyAdminResourcesAddon extends BaseCommand implements CommandExec
 		}
 	}
 
-	private void setTownMultiplier(CommandSender sender, String[] args) throws TownyException {
+	private void parseTownAdminCommand(CommandSender sender, String[] args) throws TownyException {
 
-		if (args.length < 3) {
+		if (args.length < 2) {
 			showHelp(sender);
 			return;
 		}
-		
+
 		Town town = getTownOrThrow(args[0]);
-		int multiplier = MathUtil.getPositiveIntOrThrow(args[2]);
-		TownyResourcesGovernmentMetaDataController.setTownMulitplier(town, multiplier);
-		TownyResourcesMessagingUtil.sendMsg(sender, Translatable.of("townyresources.tra_town_multiplier_set", town.getName(), multiplier));
+		String subCommand = args[1].toLowerCase(Locale.ROOT);
+
+		switch (subCommand) {
+			case "setmultiplier":
+				if (args.length < 3) {
+					showHelp(sender);
+					return;
+				}
+				int multiplier = MathUtil.getPositiveIntOrThrow(args[2]);
+				TownyResourcesGovernmentMetaDataController.setTownMulitplier(town, multiplier);
+				TownyResourcesMessagingUtil.sendMsg(sender, Translatable.of("townyresources.tra_town_multiplier_set", town.getName(), multiplier));
+				break;
+			case "setbuildrating":
+				if (args.length < 3) {
+					showHelp(sender);
+					return;
+				}
+				double rating;
+				try {
+					rating = Double.parseDouble(args[2]);
+					if (rating < 0.0 || rating > 1.0) {
+						throw new TownyException("Build rating must be a number between 0.0 and 1.0.");
+					}
+				} catch (NumberFormatException e) {
+					throw new TownyException("Build rating must be a number between 0.0 and 1.0.");
+				}
+				TownyResourcesGovernmentMetaDataController.setTownBuildRating(town, rating);
+				TownyResourcesMessagingUtil.sendMsg(sender, Translatable.of("Build rating for town " + town.getName() + " set to " + rating + "."));
+				// recalc immediately so the change takes effect right away
+				TownResourceProductionController.recalculateProductionForOneTown(town);
+				if (town.hasNation())
+					TownResourceProductionController.recalculateProductionForOneNation(town.getNationOrNull());
+				break;
+			default:
+				showHelp(sender);
+		}
 	}
 }
-

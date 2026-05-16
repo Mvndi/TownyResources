@@ -2,6 +2,7 @@ package io.github.townyadvanced.townyresources.metadata;
 
 import com.palmergames.bukkit.towny.object.Government;
 import com.palmergames.bukkit.towny.object.Town;
+import com.palmergames.bukkit.towny.object.metadata.DecimalDataField;
 import com.palmergames.bukkit.towny.object.metadata.IntegerDataField;
 import com.palmergames.bukkit.towny.object.metadata.StringDataField;
 import com.palmergames.bukkit.towny.utils.MetaDataUtil;
@@ -11,41 +12,42 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- * 
+ *
  * @author Goosius
  *
  */
 public class TownyResourcesGovernmentMetaDataController {
 
-	@SuppressWarnings("unused")
-	private TownyResources plugin;
+    @SuppressWarnings("unused")
+    private TownyResources plugin;
 
-	public TownyResourcesGovernmentMetaDataController(TownyResources plugin) {
-		this.plugin = plugin;
-	}
+    public TownyResourcesGovernmentMetaDataController(TownyResources plugin) {
+        this.plugin = plugin;
+    }
 
     private static String
-        discoveredMetadataKey = "townyresources_discovered",  //e.g.   OAK_LOG, SUGAR
-        dailyProductionMetadataKey = "townyresources_dailyproduction",  //e.g.   32-OAK_LOG, 32-SUGAR
-        availableForCollectionMetadataKey = "townyresources_availableforcollection";  //e.g.  64-OAK_LOG, 64-SUGAR
-	private static StringDataField discoveredSDF = new StringDataField(discoveredMetadataKey, "");
-	private static StringDataField dailyProductionSDF = new StringDataField(dailyProductionMetadataKey, "");
-	private static StringDataField availableForCollectionSDF = new StringDataField(availableForCollectionMetadataKey, "");
-	private static IntegerDataField townMultiplier = new IntegerDataField("towny_resources_town_multiplier", 100);
+            discoveredMetadataKey = "townyresources_discovered",  //e.g.   OAK_LOG, SUGAR
+            dailyProductionMetadataKey = "townyresources_dailyproduction",  //e.g.   32-OAK_LOG, 32-SUGAR
+            availableForCollectionMetadataKey = "townyresources_availableforcollection";  //e.g.  64-OAK_LOG, 64-SUGAR
+    private static StringDataField discoveredSDF = new StringDataField(discoveredMetadataKey, "");
+    private static StringDataField dailyProductionSDF = new StringDataField(dailyProductionMetadataKey, "");
+    private static StringDataField availableForCollectionSDF = new StringDataField(availableForCollectionMetadataKey, "");
+    private static IntegerDataField townMultiplier = new IntegerDataField("towny_resources_town_multiplier", 100);
+    private static DecimalDataField townBuildRating = new DecimalDataField("towny_resources_build_rating", 0.0);
 
     public static String getDiscovered(Government government) {
         return MetaDataUtil.getString(government, discoveredSDF).replaceAll(" ","");
     }
-    
-    
-     /**
+
+
+    /**
      * Get the discovered resources of a town
-     * 
+     *
      * Note that the order is important
      * 0 - level 1 resource
      * 1 - level 2 resource
      * etc.
-     * 
+     *
      * @param town the town
      * @return the town's discovered resources, as an IMMUTABLE list
      */
@@ -60,17 +62,17 @@ public class TownyResourcesGovernmentMetaDataController {
             return result;
         }
     }
-       
-       
-       /* 
+
+
+       /*
     /**
      * Get the discovered resources of a town
-     * 
+     *
      * Note that the order is important
      * 0 - level 1 resource
      * 1 - level 2 resource
      * etc.
-     * 
+     *
      * @param town the town
      * @return the town's discovered resources
     */
@@ -85,23 +87,23 @@ public class TownyResourcesGovernmentMetaDataController {
             for(String resourceQuantityPair: resourcesQuantitiesArray) {
                 result.add(new ResourceQuantity(res
             }
-            
+
             return new ArrayList<>();
         } else {
-            
-            return Arrays.asList(resourcesArray);        
+
+            return Arrays.asList(resourcesArray);
         }
         return result;
     }
 
     */
-    
+
     public static void setDiscovered(Government government, List<String> discoveredResources) {
         //Convert materials list to single string
         StringBuilder metadataStringBuilder = new StringBuilder();
         for(int i= 0; i < discoveredResources.size();i++) {
             if(i !=0)
-                metadataStringBuilder.append(", "); 
+                metadataStringBuilder.append(", ");
             metadataStringBuilder.append(discoveredResources.get(i));
         }
         setDiscovered(government, metadataStringBuilder.toString());
@@ -112,23 +114,23 @@ public class TownyResourcesGovernmentMetaDataController {
     }
 
     public static void removeDiscovered(Town town) {
-		town.removeMetaData(discoveredMetadataKey, true);
-	}
+        town.removeMetaData(discoveredMetadataKey, true);
+    }
 
-	public static String getDailyProduction(Government government) {
+    public static String getDailyProduction(Government government) {
         return MetaDataUtil.getString(government, dailyProductionSDF).replaceAll(" ","");
     }
-    
+
     public static String getAvailableForCollection(Government government) {
         return MetaDataUtil.getString(government, availableForCollectionSDF).replaceAll(" ","");
     }
 
     public static Map<String, Integer> getDailyProductionAsMap(Government town) {
-       return getResourceQuantitiesStringAsMap(getDailyProduction(town));
+        return getResourceQuantitiesStringAsMap(getDailyProduction(town));
     }
 
     public static Map<String, Integer> getAvailableForCollectionAsMap(Government town) {
-       return getResourceQuantitiesStringAsMap(getAvailableForCollection(town));
+        return getResourceQuantitiesStringAsMap(getAvailableForCollection(town));
     }
 
     private static Map<String, Integer> getResourceQuantitiesStringAsMap(String resourceQuantitiesString) {
@@ -139,33 +141,33 @@ public class TownyResourcesGovernmentMetaDataController {
             String resource;
             int amount;
             for(String resourceQuantityString: resourceQuantitiesArray) {
-               resourceQuantityPair = resourceQuantityString.split("-");
-               amount = Integer.parseInt(resourceQuantityPair[0]); 
-               resource = resourceQuantityPair[1];
-               result.put(resource, amount);
-            }        
+                resourceQuantityPair = resourceQuantityString.split("-");
+                amount = Integer.parseInt(resourceQuantityPair[0]);
+                resource = resourceQuantityPair[1];
+                result.put(resource, amount);
+            }
         }
-        return result;        
+        return result;
     }
-    
+
     public static void setAvailableForCollection(Government government, Map<String, Integer> availableForCollection) {
         setResourceQuantitiesString(government, availableForCollectionMetadataKey, availableForCollection);
     }
-    
+
     public static void setDailyProduction(Government government, Map<String, Integer> dailyProduction) {
         setResourceQuantitiesString(government, dailyProductionMetadataKey, dailyProduction);
     }
-    
+
     private static void setResourceQuantitiesString(Government government, String metadataKey, Map<String, Integer> resourceQuantitiesMap) {
         //Order map by descending values
         Map<String, Integer> sortedResourceQuantitiesMap = resourceQuantitiesMap.entrySet().stream()
-        .sorted(Comparator.comparingInt(e -> -e.getValue()))
-        .collect(Collectors.toMap(
-                Map.Entry::getKey,
-                Map.Entry::getValue,
-                (a, b) -> { throw new AssertionError(); },
-                LinkedHashMap::new
-        ));
+                .sorted(Comparator.comparingInt(e -> -e.getValue()))
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        Map.Entry::getValue,
+                        (a, b) -> { throw new AssertionError(); },
+                        LinkedHashMap::new
+                ));
 
         //Create list
         List<String> resourceQuantitiesList = new ArrayList<>();
@@ -175,7 +177,7 @@ public class TownyResourcesGovernmentMetaDataController {
         setResourceQuantitiesString(government, metadataKey, resourceQuantitiesList);
     }
 
-    private static void setResourceQuantitiesString(Government government, String metadataKey, List<String> resourceQuantitiesList) {        
+    private static void setResourceQuantitiesString(Government government, String metadataKey, List<String> resourceQuantitiesList) {
         //Build string
         StringBuilder resourceQuantitiesAsStringBuilder = new StringBuilder();
         boolean firstEntry = true;
@@ -183,7 +185,7 @@ public class TownyResourcesGovernmentMetaDataController {
             if(firstEntry) {
                 firstEntry = false;
             } else {
-                resourceQuantitiesAsStringBuilder.append(", ");                
+                resourceQuantitiesAsStringBuilder.append(", ");
             }
             resourceQuantitiesAsStringBuilder.append(resourceQuantity);
         }
@@ -192,19 +194,35 @@ public class TownyResourcesGovernmentMetaDataController {
         MetaDataUtil.setString(government, meta, resourceQuantitiesAsStringBuilder.toString(), false);
     }
 
-	public static void setTownMulitplier(Town town, int multiplier) {
-		if (multiplier == 100) {
-			town.removeMetaData(townMultiplier);
-			return;
-		}
-		MetaDataUtil.setInt(town, townMultiplier, multiplier, true);
-	}
+    public static void setTownMulitplier(Town town, int multiplier) {
+        if (multiplier == 100) {
+            town.removeMetaData(townMultiplier);
+            return;
+        }
+        MetaDataUtil.setInt(town, townMultiplier, multiplier, true);
+    }
 
-	public static double getTownMultiplier(Town town) {
-		return hasMultiplier(town) ? (double) MetaDataUtil.getInt(town, townMultiplier) : 100.0;
-	}
+    public static double getTownMultiplier(Town town) {
+        return hasMultiplier(town) ? (double) MetaDataUtil.getInt(town, townMultiplier) : 100.0;
+    }
 
-	public static boolean hasMultiplier(Town town) {
-		return MetaDataUtil.hasMeta(town, townMultiplier);
-	}
+    public static boolean hasMultiplier(Town town) {
+        return MetaDataUtil.hasMeta(town, townMultiplier);
+    }
+
+    public static void setTownBuildRating(Town town, double rating) {
+        if (rating == 0.0) {
+            town.removeMetaData(townBuildRating);
+            return;
+        }
+        MetaDataUtil.setDouble(town, townBuildRating, rating, true);
+    }
+
+    public static double getTownBuildRating(Town town) {
+        return MetaDataUtil.hasMeta(town, townBuildRating) ? MetaDataUtil.getDouble(town, townBuildRating) : 0.0;
+    }
+
+    public static boolean hasBuildRating(Town town) {
+        return MetaDataUtil.hasMeta(town, townBuildRating);
+    }
 }
