@@ -231,3 +231,15 @@ townyresources.tra_town_setmultiplierhelp: "Sets the multiplier of the town's re
 townyresources.tra_town_setmultiplierhelp2: "Resets the multiplier of the town's resources."
 townyresources.tra_town_multiplier_set: "The town of %s has had their multiplier set to %s."
 townyresources.town.screen.multiplier: '&2 > Multiplier: &f %s'
+
+# Town build ratings
+townyresources.build_rating.header: 'Build Rating'
+townyresources.town.screen.build_rating: '&2 > Build Rating: &f%s'
+townyresources.town.screen.build_rating_updated: '&2 > Last updated: &f%s'
+townyresources.build_rating.unknown_date: 'Unknown'
+townyresources.build_rating.date_format: 'EEEE, MMMM d, yyyy'
+townyresources.build_rating.list_no_permission: 'You do not have permission to list towns.'
+townyresources.build_rating.list_usage: 'Usage: /t list by rating [page 1-%s]'
+townyresources.build_rating.admin_help: 'Sets the build rating (0.0-1.0) which multiplies town resource production.'
+townyresources.build_rating.invalid: 'Build rating must be a number between 0.0 and 1.0.'
+townyresources.build_rating.set: 'Build rating for town %s set to %s.'

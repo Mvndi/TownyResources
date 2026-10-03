@@ -4,6 +4,7 @@ import com.palmergames.bukkit.towny.object.Government;
 import com.palmergames.bukkit.towny.object.Town;
 import com.palmergames.bukkit.towny.object.metadata.DecimalDataField;
 import com.palmergames.bukkit.towny.object.metadata.IntegerDataField;
+import com.palmergames.bukkit.towny.object.metadata.LongDataField;
 import com.palmergames.bukkit.towny.object.metadata.StringDataField;
 import com.palmergames.bukkit.towny.utils.MetaDataUtil;
 
@@ -34,6 +35,8 @@ public class TownyResourcesGovernmentMetaDataController {
     private static StringDataField availableForCollectionSDF = new StringDataField(availableForCollectionMetadataKey, "");
     private static IntegerDataField townMultiplier = new IntegerDataField("towny_resources_town_multiplier", 100);
     private static DecimalDataField townBuildRating = new DecimalDataField("towny_resources_build_rating", 0.0);
+
+    private static LongDataField townBuildRatingUpdated = new LongDataField("towny_resources_build_rating_updated", 0L);
 
     public static String getDiscovered(Government government) {
         return MetaDataUtil.getString(government, discoveredSDF).replaceAll(" ","");
@@ -211,11 +214,14 @@ public class TownyResourcesGovernmentMetaDataController {
     }
 
     public static void setTownBuildRating(Town town, double rating) {
-        if (rating == 0.0) {
-            town.removeMetaData(townBuildRating);
-            return;
-        }
-        MetaDataUtil.setDouble(town, townBuildRating, rating, true);
+        if (!Double.isFinite(rating) || rating < 0.0 || rating > 1.0)
+            throw new IllegalArgumentException("Build rating must be between 0.0 and 1.0.");
+        MetaDataUtil.setDouble(town, townBuildRating, rating, false);
+        MetaDataUtil.setLong(town, townBuildRatingUpdated, System.currentTimeMillis(), true);
+    }
+
+    public static long getTownBuildRatingUpdated(Town town) {
+        return MetaDataUtil.getLong(town, townBuildRatingUpdated);
     }
 
     public static double getTownBuildRating(Town town) {

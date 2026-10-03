@@ -13,6 +13,7 @@ import com.palmergames.bukkit.towny.scheduling.impl.FoliaTaskScheduler;
 import com.palmergames.bukkit.util.Colors;
 import io.github.townyadvanced.townyresources.commands.NationCollectAddon;
 import io.github.townyadvanced.townyresources.commands.TownResourcesAddon;
+import io.github.townyadvanced.townyresources.commands.TownRatingListAddon;
 import io.github.townyadvanced.townyresources.commands.TownyAdminResourcesAddon;
 import io.github.townyadvanced.townyresources.controllers.PlayerExtractionLimitsController;
 import io.github.townyadvanced.townyresources.controllers.TownResourceOffersController;
@@ -216,6 +217,7 @@ public class TownyResources extends JavaPlugin {
 
 	private void registerCommands() {
 		new TownResourcesAddon();
+		new TownRatingListAddon();
 		new NationCollectAddon();
 		new TownyAdminResourcesAddon();
 	}

@@ -12,6 +12,10 @@ import net.kyori.adventure.text.Component;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.Instant;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
+import com.palmergames.bukkit.towny.object.Translation;
 
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -34,15 +38,20 @@ public class TownyResourcesTownEventListener implements Listener {
 			String productionAsString = TownyResourcesGovernmentMetaDataController.getDailyProduction(town);
 			String availableAsString = TownyResourcesGovernmentMetaDataController.getAvailableForCollection(town);
 
-			if(productionAsString.isEmpty() && availableAsString.isEmpty())
-				return;
-
+			long updated = TownyResourcesGovernmentMetaDataController.getTownBuildRatingUpdated(town);
+			String rating = BigDecimal.valueOf(TownyResourcesGovernmentMetaDataController.getTownBuildRating(town))
+			        .stripTrailingZeros().toPlainString();
+			String updatedText = updated == 0L ? translator.of("townyresources.build_rating.unknown_date") : DateTimeFormatter.ofPattern(
+			        translator.of("townyresources.build_rating.date_format"), Translation.getLocale(event.getCommandSender()))
+			        .withZone(ZoneOffset.UTC).format(Instant.ofEpochMilli(updated));
 			productionAsString = TownyResourcesMessagingUtil.adjustAmountsForTownLevelModifier(town, productionAsString);
 			
 			//Resources:
 			Component component = Component.empty();
 			component = component.append(Component.newline());
 			component = component.append(TownyComponents.legacy(translator.of("townyresources.town.screen.header"))).appendNewline();
+			component = component.append(TownyComponents.legacy(translator.of("townyresources.town.screen.build_rating", rating))).appendNewline();
+			component = component.append(TownyComponents.legacy(translator.of("townyresources.town.screen.build_rating_updated", updatedText))).appendNewline();
 
 			// > Daily Productivity [2]: 32 oak Log, 32 sugar cane
 			component = component.append(TownyResourcesMessagingUtil.getSubComponentForGovernmentScreens(translator, productionAsString, "townyresources.town.screen.daily.production")).appendNewline();

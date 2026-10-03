@@ -107,7 +107,7 @@ public class TownyAdminResourcesAddon extends BaseCommand implements CommandExec
 		TownyMessaging.sendMessage(sender, ChatTools.formatCommand("Eg", "/ta resources", "bypass", translator.of("townyresources.admin_help_bypass")));
 		TownyMessaging.sendMessage(sender, ChatTools.formatCommand("Eg", "/ta resources", "town [townname] setmultiplier [percent]", translator.of("townyresources.tra_town_setmultiplierhelp")));
 		TownyMessaging.sendMessage(sender, ChatTools.formatCommand("Eg", "/ta resources", "town [townname] setmultiplier [100]", translator.of("townyresources.tra_town_setmultiplierhelp2")));
-		TownyMessaging.sendMessage(sender, ChatTools.formatCommand("Eg", "/ta resources", "town [townname] setbuildrating [0.0-1.0]", "Sets the build rating (0.0-1.0) which multiplies town resource production."));
+		TownyMessaging.sendMessage(sender, ChatTools.formatCommand("Eg", "/ta resources", "town [townname] setbuildrating [0.0-1.0]", translator.of("townyresources.build_rating.admin_help")));
 	}
 
 	private void parseReloadCommand(CommandSender sender) {
@@ -179,14 +179,14 @@ public class TownyAdminResourcesAddon extends BaseCommand implements CommandExec
 				double rating;
 				try {
 					rating = Double.parseDouble(args[2]);
-					if (rating < 0.0 || rating > 1.0) {
-						throw new TownyException("Build rating must be a number between 0.0 and 1.0.");
+					if (!Double.isFinite(rating) || rating < 0.0 || rating > 1.0) {
+						throw new TownyException(Translatable.of("townyresources.build_rating.invalid"));
 					}
 				} catch (NumberFormatException e) {
-					throw new TownyException("Build rating must be a number between 0.0 and 1.0.");
+					throw new TownyException(Translatable.of("townyresources.build_rating.invalid"));
 				}
 				TownyResourcesGovernmentMetaDataController.setTownBuildRating(town, rating);
-				TownyResourcesMessagingUtil.sendMsg(sender, Translatable.of("Build rating for town " + town.getName() + " set to " + rating + "."));
+				TownyResourcesMessagingUtil.sendMsg(sender, Translatable.of("townyresources.build_rating.set", town.getName(), rating));
 				// recalc immediately so the change takes effect right away
 				TownResourceProductionController.recalculateProductionForOneTown(town);
 				if (town.hasNation())
