@@ -37,6 +37,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 public class TownyResourcesMessagingUtil {
@@ -239,7 +240,7 @@ public class TownyResourcesMessagingUtil {
         
         materialName = Colors.strip(materialName);
         //Couldn't find a translation. Return un-translated material name
-        return StringMgmt.capitalize((materialName.replaceAll("_", " ")));
+        return StringMgmt.capitalizeStrings(materialName.toLowerCase(Locale.ROOT)).replace('_', ' ');
     }
 
 	public static String adjustAmountsForTownLevelModifier(Town town, String productionAsString) {
