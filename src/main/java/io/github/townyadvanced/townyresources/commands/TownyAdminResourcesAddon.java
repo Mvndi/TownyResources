@@ -22,6 +22,7 @@ import io.github.townyadvanced.townyresources.enums.TownyResourcesPermissionNode
 import io.github.townyadvanced.townyresources.metadata.BypassEntries;
 import io.github.townyadvanced.townyresources.metadata.TownyResourcesGovernmentMetaDataController;
 import io.github.townyadvanced.townyresources.util.TownyResourcesMessagingUtil;
+import io.github.townyadvanced.townyresources.util.BuildRatingWebhook;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -53,7 +54,6 @@ public class TownyAdminResourcesAddon extends BaseCommand implements CommandExec
 			}
 		}
 		else if (args.length == 3 && args[0].toLowerCase(Locale.ROOT).equals("town")) {
-			System.out.println("AAA " + Arrays.toString(args));
 			return Arrays.asList("setmultiplier", "setbuildrating");
 		}
 		else if (args.length == 4 && args[0].toLowerCase(Locale.ROOT).equals("town")) {
@@ -62,6 +62,9 @@ public class TownyAdminResourcesAddon extends BaseCommand implements CommandExec
 			} else {
 				return Arrays.asList("0.0","0.5","0.75","1.0");
 			}
+		}
+		else if (args.length == 5 && args[0].equalsIgnoreCase("town") && args[2].equalsIgnoreCase("setbuildrating")) {
+			return NameUtil.filterByStart(Collections.singletonList("--silent"), args[4]);
 		}
 		return Collections.emptyList();
 	}
@@ -107,7 +110,7 @@ public class TownyAdminResourcesAddon extends BaseCommand implements CommandExec
 		TownyMessaging.sendMessage(sender, ChatTools.formatCommand("Eg", "/ta resources", "bypass", translator.of("townyresources.admin_help_bypass")));
 		TownyMessaging.sendMessage(sender, ChatTools.formatCommand("Eg", "/ta resources", "town [townname] setmultiplier [percent]", translator.of("townyresources.tra_town_setmultiplierhelp")));
 		TownyMessaging.sendMessage(sender, ChatTools.formatCommand("Eg", "/ta resources", "town [townname] setmultiplier [100]", translator.of("townyresources.tra_town_setmultiplierhelp2")));
-		TownyMessaging.sendMessage(sender, ChatTools.formatCommand("Eg", "/ta resources", "town [townname] setbuildrating [0.0-1.0]", translator.of("townyresources.build_rating.admin_help")));
+		TownyMessaging.sendMessage(sender, ChatTools.formatCommand("Eg", "/ta resources", "town [townname] setbuildrating [0.0-1.0] [--silent]", translator.of("townyresources.build_rating.admin_help")));
 	}
 
 	private void parseReloadCommand(CommandSender sender) {
@@ -176,6 +179,9 @@ public class TownyAdminResourcesAddon extends BaseCommand implements CommandExec
 					showHelp(sender);
 					return;
 				}
+				if (args.length > 4 || (args.length == 4 && !args[3].equalsIgnoreCase("--silent")))
+					throw new TownyException(Translatable.of("townyresources.build_rating.usage"));
+				boolean announce = args.length == 3;
 				double rating;
 				try {
 					rating = Double.parseDouble(args[2]);
@@ -191,6 +197,8 @@ public class TownyAdminResourcesAddon extends BaseCommand implements CommandExec
 				TownResourceProductionController.recalculateProductionForOneTown(town);
 				if (town.hasNation())
 					TownResourceProductionController.recalculateProductionForOneNation(town.getNationOrNull());
+				if (announce)
+					BuildRatingWebhook.announce(town.getName(), rating, sender.getName());
 				break;
 			default:
 				showHelp(sender);

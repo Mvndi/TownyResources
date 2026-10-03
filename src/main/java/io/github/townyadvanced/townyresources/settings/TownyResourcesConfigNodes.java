@@ -13,6 +13,8 @@ public enum TownyResourcesConfigNodes {
 			"",
 			"# If true, the TownyResources system is enabled.",
 			"# if false, the TownyResources system is disabled."),		
+	DISCORD_WEBHOOK_ENABLED("discord_webhook.enabled", "false", "", "# Announce town build ratings in Discord unless --silent is specified."),
+	DISCORD_WEBHOOK_URL("discord_webhook.url", "", "# Discord webhook URL. Keep this secret."),
 	RESOURCE_EXTRACTION_LIMITS(
 			"resource_extraction_limits",
 			"",

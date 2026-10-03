@@ -34,6 +34,14 @@ public class TownyResourcesSettings {
 	private static Path configPath = TownyResources.getPlugin().getDataFolder().toPath().resolve("config.yml");
 	private final static Pattern PATTERN = Pattern.compile("\\{([^}]+)}", Pattern.CASE_INSENSITIVE);
 	
+	public static boolean isDiscordWebhookEnabled() {
+		return getBoolean(TownyResourcesConfigNodes.DISCORD_WEBHOOK_ENABLED);
+	}
+
+	public static String getDiscordWebhookUrl() {
+		return getString(TownyResourcesConfigNodes.DISCORD_WEBHOOK_URL);
+	}
+
 	public static boolean isEnabled() {
 		return getBoolean(TownyResourcesConfigNodes.ENABLED);
 	}
