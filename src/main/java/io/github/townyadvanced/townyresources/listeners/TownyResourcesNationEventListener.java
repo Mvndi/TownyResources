@@ -1,15 +1,18 @@
 package io.github.townyadvanced.townyresources.listeners;
 
+import com.palmergames.bukkit.towny.event.NationRemoveTownEvent;
 import com.palmergames.bukkit.towny.event.statusscreen.NationStatusScreenEvent;
 import com.palmergames.bukkit.towny.object.Nation;
 import com.palmergames.bukkit.towny.object.Translator;
 import com.palmergames.bukkit.towny.utils.TownyComponents;
+import io.github.townyadvanced.townyresources.controllers.TownResourceProductionController;
 import io.github.townyadvanced.townyresources.metadata.TownyResourcesGovernmentMetaDataController;
 import io.github.townyadvanced.townyresources.settings.TownyResourcesSettings;
 import io.github.townyadvanced.townyresources.util.TownyResourcesMessagingUtil;
 import net.kyori.adventure.text.Component;
 
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 
 /**
@@ -18,6 +21,15 @@ import org.bukkit.event.Listener;
  *
  */
 public class TownyResourcesNationEventListener implements Listener {
+
+	@EventHandler(priority = EventPriority.MONITOR)
+	public void onNationRemoveTown(NationRemoveTownEvent event) {
+		if (!TownyResourcesSettings.isEnabled())
+			return;
+		TownResourceProductionController.recalculateProductionForOneTown(event.getTown());
+		if (event.getNation().exists())
+			TownResourceProductionController.recalculateProductionForOneNation(event.getNation());
+	}
 
 	/*
 	 * TownyResources will add resource info to the town screen
