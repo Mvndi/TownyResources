@@ -54,9 +54,10 @@ townyresources.admin_help_reload: 'TownyResources neuladen.'
 
 ### Town Screen
 townyresources.town.screen.header: "&2Ressourcen:"
-townyresources.town.screen.daily.production: '&2 > Tägliche Produktion &a[%s]&2: &f'
-townyresources.town.screen.available.for.collection: '&2 > Verfügbar zum einsammeln &a[%s]&2: &f'
-townyresources.town.screen.town.level.modifier: '&2 > Town Level Modifier: &f %s'
+townyresources.town.screen.resources: "Ressourcen"
+townyresources.town.screen.daily.production: '&2Tägliche Produktion &a[%s]&2: &f'
+townyresources.town.screen.available.for.collection: '&2Verfügbar zum einsammeln &a[%s]&2: &f'
+townyresources.town.screen.town.level.modifier: '&2Town Level Modifier: &f %s'
 
 ### Nation Screen
 townyresources.nation.screen.header: "&2Ressourcen:"

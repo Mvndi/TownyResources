@@ -41,6 +41,8 @@ import java.util.Locale;
 import java.util.Map;
 
 public class TownyResourcesMessagingUtil {
+
+    private static final String RESOURCE_SEPARATOR = ", ";
 	private static List<String> categoryNames;
 
 	public TownyResourcesMessagingUtil(TownyResources plugin) {
@@ -164,6 +166,12 @@ public class TownyResourcesMessagingUtil {
 		return component;
 	}
     
+    public static Component getResourceDetailsComponent(Translator translator, String resourcesAsString, String langString) {
+        String[] resources = convertResourceAmountsStringToFormattedArray(resourcesAsString);
+        return TownyComponents.legacy(translator.of(langString, resources.length))
+            .append(Component.text(String.join(RESOURCE_SEPARATOR, resources), NamedTextColor.WHITE));
+    }
+
     public static String formatExtractionCategoryNameForDisplay(ResourceExtractionCategory resourceExtractionCategory, CommandSender sender) {
         String categoryName = resourceExtractionCategory.getName();
         if (categoryNames.contains("resource_category_" + categoryName)) {

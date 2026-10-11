@@ -54,9 +54,10 @@ townyresources.admin_help_reload: 'TownyResources をリロードします。'
 
 ### Town Screen
 townyresources.town.screen.header: "&2Resources:"
-townyresources.town.screen.daily.production: '&2 > 1日の産出量 &a[%s]&2: &f'
-townyresources.town.screen.available.for.collection: '&2 > 収集可能 &a[%s]&2: &f'
-townyresources.town.screen.town.level.modifier: '&2 > Townレベル補正: &f %s'
+townyresources.town.screen.resources: "Resources"
+townyresources.town.screen.daily.production: '&21日の産出量 &a[%s]&2: &f'
+townyresources.town.screen.available.for.collection: '&2収集可能 &a[%s]&2: &f'
+townyresources.town.screen.town.level.modifier: '&2Townレベル補正: &f %s'
 
 ### Nation Screen
 townyresources.nation.screen.header: "&2Resources:"

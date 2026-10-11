@@ -1,5 +1,6 @@
 package io.github.townyadvanced.townyresources.listeners;
 
+import com.palmergames.bukkit.towny.TownyFormatter;
 import com.palmergames.bukkit.towny.TownySettings;
 import com.palmergames.bukkit.towny.event.statusscreen.TownStatusScreenEvent;
 import com.palmergames.bukkit.towny.object.Town;
@@ -9,6 +10,7 @@ import io.github.townyadvanced.townyresources.metadata.TownyResourcesGovernmentM
 import io.github.townyadvanced.townyresources.settings.TownyResourcesSettings;
 import io.github.townyadvanced.townyresources.util.TownyResourcesMessagingUtil;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.event.HoverEvent;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -21,66 +23,67 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 
 /**
- * 
+ *
  * @author Goosius
  *
  */
 public class TownyResourcesTownEventListener implements Listener {
 
-	/*
-	 * TownyResources will add resource info to the town screen
-	 */
-	@EventHandler
-	public void onTownStatusScreen(TownStatusScreenEvent event) {
-		if (TownyResourcesSettings.isEnabled()) {
-			Translator translator = Translator.locale(event.getCommandSender());
-			Town town = event.getTown();
-			String productionAsString = TownyResourcesGovernmentMetaDataController.getDailyProduction(town);
-			String availableAsString = TownyResourcesGovernmentMetaDataController.getAvailableForCollection(town);
+    private static final String SCREEN_COMPONENT = "TownyResources";
+    private static final String RESOURCES_LABEL = "townyresources.town.screen.resources";
 
-			long updated = TownyResourcesGovernmentMetaDataController.getTownBuildRatingUpdated(town);
-			String rating = BigDecimal.valueOf(TownyResourcesGovernmentMetaDataController.getTownBuildRating(town))
-			        .stripTrailingZeros().toPlainString();
-			String updatedText = updated == 0L ? translator.of("townyresources.build_rating.unknown_date") : DateTimeFormatter.ofPattern(
-			        translator.of("townyresources.build_rating.date_format"), Translation.getLocale(event.getCommandSender()))
-			        .withZone(ZoneOffset.UTC).format(Instant.ofEpochMilli(updated));
-			productionAsString = TownyResourcesMessagingUtil.adjustAmountsForTownLevelModifier(town, productionAsString);
-			
-			//Resources:
-			Component component = Component.empty();
-			component = component.append(Component.newline());
-			component = component.append(TownyComponents.legacy(translator.of("townyresources.town.screen.header"))).appendNewline();
-			component = component.append(TownyComponents.legacy(translator.of("townyresources.town.screen.build_rating", rating))).appendNewline();
-			component = component.append(TownyComponents.legacy(translator.of("townyresources.town.screen.build_rating_updated", updatedText))).appendNewline();
+    /*
+     * TownyResources will add resource info to the town screen
+     */
+    @EventHandler
+    public void onTownStatusScreen(TownStatusScreenEvent event) {
+        if (TownyResourcesSettings.isEnabled()) {
+            Translator translator = Translator.locale(event.getCommandSender());
+            Town town = event.getTown();
+            String productionAsString = TownyResourcesGovernmentMetaDataController.getDailyProduction(town);
+            String availableAsString = TownyResourcesGovernmentMetaDataController.getAvailableForCollection(town);
 
-			// > Daily Productivity [2]: 32 oak Log, 32 sugar cane
-			component = component.append(TownyResourcesMessagingUtil.getSubComponentForGovernmentScreens(translator, productionAsString, "townyresources.town.screen.daily.production")).appendNewline();
+            long updated = TownyResourcesGovernmentMetaDataController.getTownBuildRatingUpdated(town);
+            String rating = BigDecimal.valueOf(TownyResourcesGovernmentMetaDataController.getTownBuildRating(town))
+                    .stripTrailingZeros().toPlainString();
+            String updatedText = updated == 0L ? translator.of("townyresources.build_rating.unknown_date") : DateTimeFormatter.ofPattern(
+                    translator.of("townyresources.build_rating.date_format"), Translation.getLocale(event.getCommandSender()))
+                    .withZone(ZoneOffset.UTC).format(Instant.ofEpochMilli(updated));
+            productionAsString = TownyResourcesMessagingUtil.adjustAmountsForTownLevelModifier(town, productionAsString);
 
-			// > Available For Collection [2]: 64 oak log, 64 sugar cane
-			component = component.append(TownyResourcesMessagingUtil.getSubComponentForGovernmentScreens(translator, availableAsString, "townyresources.town.screen.available.for.collection")).appendNewline();
-			// > TownLevel Modifier: +10%.
-			if (TownySettings.getTownLevel(town).resourceProductionModifier() != 1.0)
-				component = component.append(getTownModifierComponent(town, translator)).appendNewline();
+            Component component = Component.empty();
+            component = component.append(TownyComponents.legacy(translator.of("townyresources.town.screen.build_rating", rating))).appendNewline();
+            component = component.append(TownyComponents.legacy(translator.of("townyresources.town.screen.build_rating_updated", updatedText))).appendNewline();
 
-			// > Multiplier: 100%
-			if (TownyResourcesGovernmentMetaDataController.hasMultiplier(town))
-				component = component.append(getMultiplierComponent(town, translator)).appendNewline();
+            // > Daily Productivity [2]: 32 oak Log, 32 sugar cane
+            component = component.append(TownyResourcesMessagingUtil.getResourceDetailsComponent(translator, productionAsString, "townyresources.town.screen.daily.production")).appendNewline();
 
-			event.getStatusScreen().addComponentOf("TownyResources", component);
-		}
-	}
+            // > Available For Collection [2]: 64 oak log, 64 sugar cane
+            component = component.append(TownyResourcesMessagingUtil.getResourceDetailsComponent(translator, availableAsString, "townyresources.town.screen.available.for.collection"));
+            // > TownLevel Modifier: +10%.
+            if (TownySettings.getTownLevel(town).resourceProductionModifier() != 1.0)
+                component = component.appendNewline().append(getTownModifierComponent(town, translator));
 
-	private Component getTownModifierComponent(Town town, Translator translator) {
-		double townModifier = TownySettings.getTownLevel(town).resourceProductionModifier();
-		String modifierSlug = "";
-		if (townModifier > 1.0)
-			modifierSlug = "+" + BigDecimal.valueOf((townModifier - 1) * 100).setScale(2, RoundingMode.HALF_UP).doubleValue();
-		if (townModifier < 1.0)
-			modifierSlug = String.valueOf(BigDecimal.valueOf((townModifier * 100) - 100).setScale(2, RoundingMode.HALF_UP).doubleValue()); 
-		return Component.text(translator.of("townyresources.town.screen.town.level.modifier", modifierSlug)).append(Component.text("%"));
-	}
+            // > Multiplier: 100%
+            if (TownyResourcesGovernmentMetaDataController.hasMultiplier(town))
+                component = component.appendNewline().append(getMultiplierComponent(town, translator));
 
-	private Component getMultiplierComponent(Town town, Translator translator) {
-		return Component.text(translator.of("townyresources.town.screen.multiplier", TownyResourcesGovernmentMetaDataController.getTownMultiplier(town))).append(Component.text("%"));
-	}
+            event.getStatusScreen().addComponentOf(SCREEN_COMPONENT,
+                TownyFormatter.colourHoverKey(translator.of(RESOURCES_LABEL)), HoverEvent.showText(component));
+        }
+    }
+
+    private Component getTownModifierComponent(Town town, Translator translator) {
+        double townModifier = TownySettings.getTownLevel(town).resourceProductionModifier();
+        String modifierSlug = "";
+        if (townModifier > 1.0)
+            modifierSlug = "+" + BigDecimal.valueOf((townModifier - 1) * 100).setScale(2, RoundingMode.HALF_UP).doubleValue();
+        if (townModifier < 1.0)
+            modifierSlug = String.valueOf(BigDecimal.valueOf((townModifier * 100) - 100).setScale(2, RoundingMode.HALF_UP).doubleValue());
+        return Component.text(translator.of("townyresources.town.screen.town.level.modifier", modifierSlug)).append(Component.text("%"));
+    }
+
+    private Component getMultiplierComponent(Town town, Translator translator) {
+        return Component.text(translator.of("townyresources.town.screen.multiplier", TownyResourcesGovernmentMetaDataController.getTownMultiplier(town))).append(Component.text("%"));
+    }
 }

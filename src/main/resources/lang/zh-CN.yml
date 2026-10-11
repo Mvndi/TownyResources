@@ -54,9 +54,10 @@ townyresources.admin_help_reload: '重载插件配置文件.'
 
 ### Town Screen
 townyresources.town.screen.header: "&2城镇资源:"
-townyresources.town.screen.daily.production: '&2 > 每日产出 &a[%s]&2: &f'
-townyresources.town.screen.available.for.collection: '&2 > 可收集 &a[%s]&2: &f'
-townyresources.town.screen.town.level.modifier: '&2 > Town Level Modifier: &f %s'
+townyresources.town.screen.resources: "城镇资源"
+townyresources.town.screen.daily.production: '&2每日产出 &a[%s]&2: &f'
+townyresources.town.screen.available.for.collection: '&2可收集 &a[%s]&2: &f'
+townyresources.town.screen.town.level.modifier: '&2Town Level Modifier: &f %s'
 
 ### Nation Screen
 townyresources.nation.screen.header: "&2国家资源:"
