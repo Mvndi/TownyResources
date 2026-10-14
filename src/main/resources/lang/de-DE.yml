@@ -61,8 +61,8 @@ townyresources.town.screen.town.level.modifier: '&2Town Level Modifier: &f %s'
 
 ### Nation Screen
 townyresources.nation.screen.header: "&2Ressourcen:"
-townyresources.nation.screen.daily.production: '&2 > Tägliche Produktion &a[%s]&2: &f'
-townyresources.nation.screen.available.for.collection: '&2 > Verfügbar zum einsammeln &a[%s]&2: &f'
+townyresources.nation.screen.daily.production: '&2Tägliche Produktion &a[%s]&2: &f'
+townyresources.nation.screen.available.for.collection: '&2Verfügbar zum einsammeln &a[%s]&2: &f'
 
 ### Surveys 
 townyresources.not_your_town: 'Du gehörst nicht zu dieser Stadt.'

@@ -61,8 +61,8 @@ townyresources.town.screen.town.level.modifier: '&2Town Level Modifier: &f %s'
 
 ### Nation Screen
 townyresources.nation.screen.header: "&2Resources:"
-townyresources.nation.screen.daily.production: '&2 > Daily Production &a[%s]&2: &f'
-townyresources.nation.screen.available.for.collection: '&2 > Available For Collection &a[%s]&2: &f'
+townyresources.nation.screen.daily.production: '&2Daily Production &a[%s]&2: &f'
+townyresources.nation.screen.available.for.collection: '&2Available For Collection &a[%s]&2: &f'
 
 ### TownBlock Screen
 townyresources.townblock.screen.header: "&2Resources:"
